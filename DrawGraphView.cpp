@@ -41,8 +41,10 @@ BEGIN_MESSAGE_MAP(CDrawGraphView, CView)
 	ON_COMMAND(ID_MiddleDraw, &CDrawGraphView::OnMiddledraw)
 	ON_COMMAND(ID_bresenham, &CDrawGraphView::OnBresenhamLine)
 	ON_COMMAND(ID_CircleMiddle, &CDrawGraphView::OnCircleMiddle)
-	ON_COMMAND(ID_CircleBresenham, &CDrawGraphView::OnCircleBresenham)
+
 	ON_COMMAND(ID_OvalMiddle, &CDrawGraphView::OnOvalMiddle)
+	ON_COMMAND(ID_CircleBresenham, &CDrawGraphView::OnCirclebresenham)
+	ON_WM_RBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 // CDrawGraphView 构造/析构
@@ -150,6 +152,14 @@ void CDrawGraphView::OnLButtonDown(UINT nFlags, CPoint point)
 	m_point1 = point;
 }
 
+void CDrawGraphView::OnRButtonDblClk(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	CView::OnRButtonDblClk(nFlags, point);
+	m_point3 = point;
+}
+
 
 void CDrawGraphView::OnLButtonUp(UINT nFlags, CPoint point)
 {
@@ -176,6 +186,12 @@ void CDrawGraphView::OnLButtonUp(UINT nFlags, CPoint point)
 		break;
 	case 3:
 		CircleMiddle(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, RED);
+		break;
+	case 4:
+		CircleBresenham(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, GREEN);
+		break;
+	case 5:
+		OvalMiddle(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, BLUE);
 		break;
 	default:
 		break;
@@ -459,28 +475,104 @@ void CDrawGraphView::CircleMiddle(HDC hdc, int x0, int y0, int x1, int y1, int c
 {
 	int x, y;
 	float d;
-	y = CircleInit(x0, y0, x1, y1);
-	x = 0; d = 1.25 - y;
+	y = CircleInit(x0, y0, x1, y1);//初始化：计算圆的半径，两点之间的距离
+	x = 0; d = 1.25 - y;//d=1.25-r
 	CirclePoints(hdc, x, y, color); //显示圆弧上的八个对称点
 	while (x <= y)
 	{
-		if (d < 0)   d += 2 * x + 3;
+		if (d < 0)   d += 2 * x + 3;//如果d<0，那么d=d+2*x+3
 		else
 		{
-			d += 2 * (x - y) + 5;  y--;
+			d += 2 * (x - y) + 5;  y--; //d>0时，d=d+2*(x-y)+5
 		}
 		x++;
 		CirclePoints(hdc, x, y, color);
 	}
 
 }
-void CDrawGraphView::CircleBresenham(HDC hdc, int x0, int y0, int x1, int y1, int color)
+void CDrawGraphView::CircleBresenham(HDC hdc, int x0, int y0, int x1, int y1, int color)//四分之一圆
 {
+	int x = 0;
+	int y = CircleInit(x0, y0, x1, y1);//初始化：计算圆的半径，两点之间的距离
+	int delta = 2 * (1 - y);//d=2(1-R)
+	int delta1, delta2;
+	int direction = 0;
+	int limit = 0;
+	while (y >= limit)
+	{
+		CirclePoints(hdc, x, y, color);
+		if (delta < 0)
+		{
+			delta1 = 2 * (delta + y) - 1;
+			if (delta1 <= 0) direction = 1;//取H点
+			else direction = 2;//取D点
+		}
+		else if (delta > 0)
+		{
+			delta2 = 2 * (delta - x) - 1;
+			if (delta2 < 0) direction = 2;//取D点
+			else direction = 3;//取V点
+		}
+		else //delta=0
+			direction = 2;
 
+		switch (direction)
+		{
+		case 1:   x++;
+			delta += 2 * x + 1;
+			break;
+		case 2:   x++;
+			y--;
+			delta += 2 * (x - y + 1);
+			break;
+		case 3:   y--;
+			delta += (-2 * y + 1);
+			break;
+		}
+	}
 }
+
 void CDrawGraphView::OvalMiddle(HDC hdc, int x0, int y0, int x1, int y1, int color)
 {
+	int x3 = x0;
+	int y3 = y1;//确定原点坐标
+	int a = abs(x0 - x1);
+	int b = abs(y0 - y1);
 
+	int x = 0, y = b;
+	float d;
+	ovalPoints(hdc, x3, y3, x, y, color);
+	d = b * b + a * a * (-b + 0.25);
+	while ((b * b * (x + 1)) < (a * a * (y - 0.5)))//当b2(x + 1) < a2(y - 0.5)时，重复步骤3和4。否则转到步骤6
+	{
+		if (d <= 0)//d更新为d+b2(2x+3)，再将(x,y)更新为(x+1,y)
+		{
+			d += b * b * (2 * x + 3);
+		}
+		else//d更新为d+b2(2x+3)+a2(-2y+2)，再将(x,y)更新为(x+1,y-1)。
+		{
+			d += b * b * (2 * x + 3) + a * a * (-2 * y + 2);
+			y--;
+		}
+		x++;
+		ovalPoints(hdc, x3, y3, x, y, color);
+	}
+	d = b * b * (x + 0.5) * (x + 0.5) + a * a * (y - 1) * (y - 1) - a * a * b * b;//用上半部分计算的最后点(x,y)来计算下半部分中d的初值：
+
+	while (y >= 0)//下半部分
+	{
+		if (d <= 0)
+		{
+			d += b * b * (2 * x + 2) + a * a * (-2 * y + 3);
+			x++;
+		}
+		else
+		{
+			d += a * a * (-2 * y + 3);
+		}
+		y--;
+		ovalPoints(hdc, x3, y3, x, y, color);
+	}
 }
 int CDrawGraphView::Sign(int x)//判断符号
 {
@@ -499,6 +591,13 @@ void CDrawGraphView::CirclePoints(HDC hdc, int x, int y, int color)//圆的8对�
 	SetPixel(hdc, -y + m_point1.x, x + m_point1.y, color);
 	SetPixel(hdc, -x + m_point1.x, -y + m_point1.y, color);
 	SetPixel(hdc, -y + m_point1.x, -x + m_point1.y, color);
+}
+void CDrawGraphView::ovalPoints(HDC hdc, int x0, int y0, int x, int y, int color)	 
+{
+	SetPixel(hdc, x0 + x, y0 + y, color);
+	SetPixel(hdc, x0 - x, y0 + y, color);
+	SetPixel(hdc, x0 + x, y0 - y, color);
+	SetPixel(hdc, x0 - x, y0 - y, color);
 }
 int CDrawGraphView::CircleInit(int x0, int y0, int x1, int y1)
 {
@@ -526,14 +625,15 @@ void CDrawGraphView::OnCircleMiddle()
 	// TODO: 在此添加命令处理程序代码
 	Choose = 3;
 }
-void CDrawGraphView::OnCircleBresenham()
-{
-	// TODO: 在此添加命令处理程序代码
-	Choose = 4;
-
-}
 void CDrawGraphView::OnOvalMiddle()
 {
 	// TODO: 在此添加命令处理程序代码
 	Choose = 5;
 }
+
+void CDrawGraphView::OnCirclebresenham()
+{
+	Choose = 4;
+	// TODO: 在此添加命令处理程序代码
+}
+

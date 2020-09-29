@@ -16,6 +16,7 @@ public:
 	CDrawGraphDoc* GetDocument() const;
 	CPoint m_point1;
 	CPoint m_point2;
+	CPoint m_point3;
 	void DDALine(HDC hdc, int x0, int y0, int x1, int y1, int color);
 	void MidpointLine(HDC hdc, int x0, int y0, int x1, int y1, int color);
 	void IntegerBresenhamLine(HDC hdc, int x0, int y0, int x1, int y1, int color);
@@ -25,6 +26,7 @@ public:
 	int Sign(int x);
 	void CirclePoints(HDC hdc, int x, int y, int color);//圆的8对称性画点
 	int CircleInit(int x0, int y0, int x1, int y1);
+	void ovalPoints(HDC hdc,int x0,int y0, int x, int y, int color);
 	int Choose = 0;
 	int Type=0;
 // 操作
@@ -64,6 +66,8 @@ public:
 	afx_msg void OnCircleMiddle();
 	afx_msg void OnCircleBresenham();
 	afx_msg void OnOvalMiddle();
+	afx_msg void OnCirclebresenham();
+	afx_msg void OnRButtonDblClk(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // DrawGraphView.cpp 中的调试版本
