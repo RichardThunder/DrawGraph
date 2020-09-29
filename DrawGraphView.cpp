@@ -20,6 +20,8 @@
 #define RED RGB(255,0,0)
 #define GREEN RGB(0,255,0)
 #define BLUE RGB(0,0,255)
+#define DRAWLINE 1
+#define DRAWCIRCLE 2
 
 // CDrawGraphView
 
@@ -38,6 +40,9 @@ BEGIN_MESSAGE_MAP(CDrawGraphView, CView)
 	ON_COMMAND(ID_DDA, &CDrawGraphView::OnDDA)
 	ON_COMMAND(ID_MiddleDraw, &CDrawGraphView::OnMiddledraw)
 	ON_COMMAND(ID_bresenham, &CDrawGraphView::OnBresenhamLine)
+	ON_COMMAND(ID_CircleMiddle, &CDrawGraphView::OnCircleMiddle)
+	ON_COMMAND(ID_CircleBresenham, &CDrawGraphView::OnCircleBresenham)
+	ON_COMMAND(ID_OvalMiddle, &CDrawGraphView::OnOvalMiddle)
 END_MESSAGE_MAP()
 
 // CDrawGraphView 构造/析构
@@ -49,8 +54,7 @@ CDrawGraphView::CDrawGraphView() noexcept
 }
 
 CDrawGraphView::~CDrawGraphView()
-{
-}
+{}
 
 BOOL CDrawGraphView::PreCreateWindow(CREATESTRUCT& cs)
 {
@@ -158,7 +162,8 @@ void CDrawGraphView::OnLButtonUp(UINT nFlags, CPoint point)
 	m_point2 = point;
 
 	//选择绘制算法
-	switch (LineChoose)
+
+	switch (Choose)
 	{
 	case 0:
 		DDALine(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, RED);
@@ -169,11 +174,16 @@ void CDrawGraphView::OnLButtonUp(UINT nFlags, CPoint point)
 	case 2:
 		IntegerBresenhamLine(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, BLUE);
 		break;
+	case 3:
+		CircleMiddle(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, RED);
+		break;
 	default:
 		break;
 	}
 	DeleteDC(hdc);
 }
+
+
 
 
 void CDrawGraphView::DDALine(HDC hdc, int x0, int y0, int x1, int y1, int color)
@@ -445,8 +455,33 @@ void CDrawGraphView::IntegerBresenhamLine(HDC hdc, int x0, int y0, int x1, int y
 		e = e + 2 * dy;
 	}
 }
+void CDrawGraphView::CircleMiddle(HDC hdc, int x0, int y0, int x1, int y1, int color)
+{
+	int x, y;
+	float d;
+	y = CircleInit(x0, y0, x1, y1);
+	x = 0; d = 1.25 - y;
+	CirclePoints(hdc, x, y, color); //显示圆弧上的八个对称点
+	while (x <= y)
+	{
+		if (d < 0)   d += 2 * x + 3;
+		else
+		{
+			d += 2 * (x - y) + 5;  y--;
+		}
+		x++;
+		CirclePoints(hdc, x, y, color);
+	}
 
+}
+void CDrawGraphView::CircleBresenham(HDC hdc, int x0, int y0, int x1, int y1, int color)
+{
 
+}
+void CDrawGraphView::OvalMiddle(HDC hdc, int x0, int y0, int x1, int y1, int color)
+{
+
+}
 int CDrawGraphView::Sign(int x)//判断符号
 {
 	if (x > 0) return 1;
@@ -454,22 +489,51 @@ int CDrawGraphView::Sign(int x)//判断符号
 	else  return -1;
 }
 
+void CDrawGraphView::CirclePoints(HDC hdc, int x, int y, int color)//圆的8对称点画法实现
+{
+	SetPixel(hdc, x + m_point1.x, y + m_point1.y, color);
+	SetPixel(hdc, y + m_point1.x, x + m_point1.y, color);
+	SetPixel(hdc, -x + m_point1.x, y + m_point1.y, color);
+	SetPixel(hdc, y + m_point1.x, -x + m_point1.y, color);
+	SetPixel(hdc, x + m_point1.x, -y + m_point1.y, color);
+	SetPixel(hdc, -y + m_point1.x, x + m_point1.y, color);
+	SetPixel(hdc, -x + m_point1.x, -y + m_point1.y, color);
+	SetPixel(hdc, -y + m_point1.x, -x + m_point1.y, color);
+}
+int CDrawGraphView::CircleInit(int x0, int y0, int x1, int y1)
+{
+	int r = 0;
+	r = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
+	return r;
+}
 void CDrawGraphView::OnDDA()
 {
 	// TODO: 在此添加命令处理程序代码
-	LineChoose = 0;
+	Choose = 0;
 }
-
-
 void CDrawGraphView::OnMiddledraw()
 {
 	// TODO: 在此添加命令处理程序代码
-	LineChoose = 1;
+	Choose = 1;
 }
-
-
 void CDrawGraphView::OnBresenhamLine()
 {
 	// TODO: 在此添加命令处理程序代码
-	LineChoose = 2;
+	Choose = 2;
+}
+void CDrawGraphView::OnCircleMiddle()
+{
+	// TODO: 在此添加命令处理程序代码
+	Choose = 3;
+}
+void CDrawGraphView::OnCircleBresenham()
+{
+	// TODO: 在此添加命令处理程序代码
+	Choose = 4;
+
+}
+void CDrawGraphView::OnOvalMiddle()
+{
+	// TODO: 在此添加命令处理程序代码
+	Choose = 5;
 }

@@ -1,6 +1,6 @@
-Ôªø//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ ÁîüÊàêÁöÑÂåÖÂê´Êñá‰ª∂„ÄÇ
-// ‰æõ DrawGraph.rc ‰ΩøÁî®
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ …˙≥…µƒ∞¸∫¨Œƒº˛°£
+// π© DrawGraph.rc  π”√
 //
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
@@ -90,13 +90,19 @@
 #define ID_DDA                          32774
 #define ID_MiddleDraw                   32775
 #define ID_bresenham                    32776
+#define ID_32777                        32777
+#define ID_32778                        32778
+#define ID_32779                        32779
+#define ID_CircleMiddle                 32780
+#define ID_CircleBresenham              32781
+#define ID_OvalMiddle                   32782
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        310
-#define _APS_NEXT_COMMAND_VALUE         32777
+#define _APS_NEXT_COMMAND_VALUE         32783
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
