@@ -592,7 +592,7 @@ void CDrawGraphView::CirclePoints(HDC hdc, int x, int y, int color)//圆的8对�
 	SetPixel(hdc, -x + m_point1.x, -y + m_point1.y, color);
 	SetPixel(hdc, -y + m_point1.x, -x + m_point1.y, color);
 }
-void CDrawGraphView::ovalPoints(HDC hdc, int x0, int y0, int x, int y, int color)	 
+void CDrawGraphView::ovalPoints(HDC hdc, int x0, int y0, int x, int y, int color)
 {
 	SetPixel(hdc, x0 + x, y0 + y, color);
 	SetPixel(hdc, x0 - x, y0 + y, color);
@@ -627,7 +627,7 @@ void CDrawGraphView::OnCircleMiddle()
 }
 void CDrawGraphView::OnOvalMiddle()
 {
-	// TODO: 在此添加命令处理程序代码
+	
 	Choose = 5;
 }
 
