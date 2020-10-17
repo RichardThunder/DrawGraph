@@ -183,6 +183,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CAET.h" />
+    <ClInclude Include="CBucket.h" />
+    <ClInclude Include="CFill.h" />
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="DrawGraph.h" />
     <ClInclude Include="DrawGraphDoc.h" />
@@ -198,6 +201,9 @@
     <ClInclude Include="ViewTree.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CAET.cpp" />
+    <ClCompile Include="CBucket.cpp" />
+    <ClCompile Include="CFill.cpp" />
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="DrawGraph.cpp" />
     <ClCompile Include="DrawGraphDoc.cpp" />

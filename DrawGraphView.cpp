@@ -17,6 +17,7 @@
 #define new DEBUG_NEW
 #endif
 #include "ClassView.h"
+#include "CFill.h"
 #define RED RGB(255,0,0)
 #define GREEN RGB(0,255,0)
 #define BLUE RGB(0,0,255)
@@ -45,6 +46,10 @@ BEGIN_MESSAGE_MAP(CDrawGraphView, CView)
 	ON_COMMAND(ID_OvalMiddle, &CDrawGraphView::OnOvalMiddle)
 	ON_COMMAND(ID_CircleBresenham, &CDrawGraphView::OnCirclebresenham)
 	ON_WM_RBUTTONDBLCLK()
+	//ON_COMMAND(ID_Polygonpaint, &CDrawGraphView::OnPolygonpaint)
+	ON_WM_LBUTTONDBLCLK()
+	ON_WM_LBUTTONUP()
+	ON_COMMAND(ID_Polygonpaint, &CDrawGraphView::OnPolygonpaint)
 END_MESSAGE_MAP()
 
 // CDrawGraphView 构造/析构
@@ -143,60 +148,72 @@ CDrawGraphDoc* CDrawGraphView::GetDocument() const // 非调试版本是内联�
 // CDrawGraphView 消息处理程序
 
 
+//
+//void CDrawGraphView::OnLButtonDown(UINT nFlags, CPoint point)
+//{
+//	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//
+//	CView::OnLButtonDown(nFlags, point);
+//	m_point1 = point;
+//}
 
-void CDrawGraphView::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//void CDrawGraphView::OnRButtonDblClk(UINT nFlags, CPoint point)
+//{
+//	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//
+//	CView::OnRButtonDblClk(nFlags, point);
+//	m_point3 = point;
+//	PolygonGetPoint( m_point3.x, m_point3.y);
+//}
 
-	CView::OnLButtonDown(nFlags, point);
-	m_point1 = point;
-}
 
-void CDrawGraphView::OnRButtonDblClk(UINT nFlags, CPoint point)
-{
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//void CDrawGraphView::OnLButtonUp(UINT nFlags, CPoint point)
+//{
+//	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//
+//	CView::OnLButtonUp(nFlags, point);
+//	
+//	m_point2 = point;
+//
+//
+//	
+//}
 
-	CView::OnRButtonDblClk(nFlags, point);
-	m_point3 = point;
-}
-
+//
+//
+//void CDrawGraphView::OnLButtonDblClk(UINT nFlags, CPoint point)
+//{
+//	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//
+//
+//	CView::OnLButtonDblClk(nFlags, point);
+//	//HWND hWnd = AfxGetMainWnd()->m_hWnd;
+//	//HDC hdc = ::GetDC(m_hWnd);
+//	//circle(point.x, point.y, 0x0);
+//	//SetPixel(hdc, point.x, point.y, 0x0);
+//	//m_point1 = point;
+//	//PolygonGetPoint(point.x,point.y);
+//	//DeleteDC(hdc);
+//
+//}
 
 void CDrawGraphView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
 	CView::OnLButtonUp(nFlags, point);
-	CView::OnLButtonUp(nFlags, point);
 	HWND hWnd = AfxGetMainWnd()->m_hWnd;
 	HDC hdc = ::GetDC(m_hWnd);
-	m_point2 = point;
-
-	//选择绘制算法
-
-	switch (Choose)
-	{
-	case 0:
-		DDALine(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, RED);
-		break;
-	case 1:
-		MidpointLine(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, GREEN);
-		break;
-	case 2:
-		IntegerBresenhamLine(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, BLUE);
-		break;
-	case 3:
-		CircleMiddle(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, RED);
-		break;
-	case 4:
-		CircleBresenham(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, GREEN);
-		break;
-	case 5:
-		OvalMiddle(hdc, m_point1.x, m_point1.y, m_point2.x, m_point2.y, BLUE);
-		break;
-	default:
-		break;
-	}
-	DeleteDC(hdc);
+	SetPixel(hdc, point.x - 1, point.y - 1, 0x0);
+	SetPixel(hdc, point.x, point.y - 1, 0x0);
+	SetPixel(hdc, point.x + 1, point.y - 1, 0x0);
+	SetPixel(hdc, point.x - 1, point.y, 0x0);
+	SetPixel(hdc, point.x, point.y, 0x0);
+	SetPixel(hdc, point.x + 1, point.y, 0x0);
+	SetPixel(hdc, point.x - 1, point.y + 1, 0x0);
+	SetPixel(hdc, point.x, point.y + 1, 0x0);
+	SetPixel(hdc, point.x + 1, point.y + 1, 0x0);
+	PolygonGetPoint(point.x, point.y);
 }
 
 
@@ -531,7 +548,6 @@ void CDrawGraphView::CircleBresenham(HDC hdc, int x0, int y0, int x1, int y1, in
 		}
 	}
 }
-
 void CDrawGraphView::OvalMiddle(HDC hdc, int x0, int y0, int x1, int y1, int color)
 {
 	int x3 = x0;
@@ -592,7 +608,7 @@ void CDrawGraphView::CirclePoints(HDC hdc, int x, int y, int color)//圆的8对�
 	SetPixel(hdc, -x + m_point1.x, -y + m_point1.y, color);
 	SetPixel(hdc, -y + m_point1.x, -x + m_point1.y, color);
 }
-void CDrawGraphView::ovalPoints(HDC hdc, int x0, int y0, int x, int y, int color)	 
+void CDrawGraphView::ovalPoints(HDC hdc, int x0, int y0, int x, int y, int color)
 {
 	SetPixel(hdc, x0 + x, y0 + y, color);
 	SetPixel(hdc, x0 - x, y0 + y, color);
@@ -605,6 +621,88 @@ int CDrawGraphView::CircleInit(int x0, int y0, int x1, int y1)
 	r = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
 	return r;
 }
+
+void CDrawGraphView::PolygonPaint(HDC hdc)
+{
+	for (int i = 1; i < Polygon_count; i++)
+	{
+		IntegerBresenhamLine(hdc, Polygon_array[i - 1][0], Polygon_array[i - 1][1], Polygon_array[i][0], Polygon_array[i][1], 0);
+	}
+	IntegerBresenhamLine(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[Polygon_count - 1][0], Polygon_array[Polygon_count - 1][1], 0);
+	/*CRect rect;
+	GetClientRect(&rect);
+	pDC->SetMapMode(MM_ANISOTROPIC);
+	pDC->SetWindowExt(rect.Width(), rect.Height());
+	pDC->SetViewportExt(rect.Width(), -rect.Height());
+	pDC->SetViewportOrg(rect.Width() / 2, rect.Height() / 2);
+	rect.OffsetRect(-rect.Width() / 2, -rect.Height() / 2);*/
+	//CDC* pDC = CDC::FromHandle(hdc);
+	////声明Fill类
+	//CFill* cFill = new CFill;
+
+	////声明多边形的七个顶点
+	//CPoint points[7] = { CPoint(50,70),CPoint(-150,270),CPoint(-250,20),CPoint(-150,-280),CPoint(0,-80),CPoint(100,-280),CPoint(300,120) };
+
+	////设置顶点
+	//cFill->SetPoint(points, 7);
+	//
+	////创建桶表
+	//cFill->CreateBucket();
+
+	////创建边表
+	//cFill->CreateEdge();
+
+	////填充多边形
+	//cFill->Gouraud(pDC);
+}
+
+void CDrawGraphView::PolygonGetPoint(int x, int y)
+{
+	Polygon_array[Polygon_count][0] = x;
+	Polygon_array[Polygon_count][1] = y;
+	Polygon_count++;
+}
+
+
+BOOL CDrawGraphView::PreTranslateMessage(MSG* pMsg)//响应键盘消息绘图
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+	{
+		HWND hWnd = AfxGetMainWnd()->m_hWnd;
+		HDC hdc = ::GetDC(m_hWnd);
+		switch (Choose)	//选择绘制算法
+		{
+		case 0:
+			DDALine(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[1][0], Polygon_array[1][1], RED); Polygon_count = 0;
+			break;
+		case 1:
+			MidpointLine(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[1][0], Polygon_array[1][1], GREEN); Polygon_count = 0;
+			break;
+		case 2:
+			IntegerBresenhamLine(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[1][0], Polygon_array[1][1], BLUE); Polygon_count = 0;
+			break;
+		case 3:
+			CircleMiddle(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[1][0], Polygon_array[1][1], RED); Polygon_count = 0;
+			break;
+		case 4:
+			CircleBresenham(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[1][0], Polygon_array[1][1], GREEN); Polygon_count = 0;
+			break;
+		case 5:
+			OvalMiddle(hdc, Polygon_array[0][0], Polygon_array[0][1], Polygon_array[1][0], Polygon_array[1][1], BLUE); Polygon_count = 0;
+			break;
+		case 6:
+			PolygonPaint(hdc);
+			Polygon_count = 0;
+			break;
+		default:
+			break;
+		}
+		DeleteDC(hdc);
+	}
+	return CView::PreTranslateMessage(pMsg);
+}
+
 void CDrawGraphView::OnDDA()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -625,15 +723,18 @@ void CDrawGraphView::OnCircleMiddle()
 	// TODO: 在此添加命令处理程序代码
 	Choose = 3;
 }
-void CDrawGraphView::OnOvalMiddle()
-{
-	// TODO: 在此添加命令处理程序代码
-	Choose = 5;
-}
-
 void CDrawGraphView::OnCirclebresenham()
 {
 	Choose = 4;
 	// TODO: 在此添加命令处理程序代码
 }
+void CDrawGraphView::OnOvalMiddle()
+{
 
+	Choose = 5;
+}
+void CDrawGraphView::OnPolygonpaint()
+{
+	// TODO: 在此添加命令处理程序代码
+	Choose = 6;
+}
