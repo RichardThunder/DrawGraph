@@ -1,134 +1,35 @@
-#include <graphics.h>
-#include <conio.h>
-#include <stdio.h>
-#include <string.h>
-#include <queue>
-#include <windows.h>
-
+#if 0
+#include "Seed.h"
 using namespace std;
-
-struct Point
-{    //¼ÇÂ¼µã
-	float x, y;
-}point[100];
-
-struct Seed
-{
-	float x, y;
-}seed;
-
-struct XET
-{       //¼ÇÂ¼±ß
-	float xmin, ymax, ymin;
-	float dx;
-}pNET[1024];
-
-//ÓÅÏÈ¶ÓÁĞ±£´æÄ³ÌõÉ¨ÃèÏßÉÏµÄxÖµ
-priority_queue<float, vector<float>, greater<float> >s;
-
-int MaxY = 0;
-int MinY = 2000;
-//´òµã
-void pt();
-//Á¬Ïß
-void DDALine(int x0, int y0, int x1, int y1, int color)
-{
-	int t;
-	float dx, dy, k;
-	dx = x1 - x0;
-	dy = y1 - y0;
-	k = dy / dx;
-
-	if (-1 <= k && k <= 1)
-	{  //ÅĞ¶ÏĞ±ÂÊ
-		if (x1 < x0)
-		{  //È·¶¨ÆğÊ¼µãÖÕµã
-			t = x0, x0 = x1, x1 = t;
-			t = y0, y0 = y1, y1 = t;
-		}
-		int x;
-		float y;
-		y = y0;
-		for (x = x0; x <= x1; x++)
-		{
-			putpixel(x, int(y + 0.5), color);
-			y = y + k;
-		}
-	}
-	else
-	{
-		if (y1 < y0)
-		{  //È·¶¨ÆğÊ¼µãÖÕµã
-			t = x0, x0 = x1, x1 = t;
-			t = y0, y0 = y1, y1 = t;
-		}
-		int y;
-		float x;
-		x = x0;
-		for (y = y0; y <= y1; y++)
-		{
-			putpixel(int(x + 0.5), y, color);
-			x = x + 1 / k;
-		}
-	}
-}
-void Boundfill(int x, int y, int boundarycolor, int newcolor)
-{
-	int color = getpixel(x, y);
-	if (color != newcolor && color != boundarycolor)
-	{
-		putpixel(x, y, newcolor);
-		Boundfill(x, y + 1, boundarycolor, newcolor);
-		Boundfill(x, y - 1, boundarycolor, newcolor);
-		Boundfill(x - 1, y, boundarycolor, newcolor);
-		Boundfill(x + 1, y, boundarycolor, newcolor);
-	}
-}
-//ÖØ»æ±ß
-void edge(int num, int x, int y)
-{
-	//ÔÙ´ÎÁ¬Ïß£¬±£Ö¤±ß½çÎª»ÆÉ«
-	for (int n = 1; n < num-1; n++)
-	{
-		DDALine(point[n - 1].x, point[n - 1].y, point[n].x, point[n].y, YELLOW);
-	}
-	DDALine(point[0].x, point[0].y, point[num - 2].x, point[num - 2].y, YELLOW);
-	//µ÷ÓÃÖÖ×ÓÌî³ä
-	Boundfill(x, y, YELLOW, BLUE);
-	//ÖØÖÃµã
-	pt();
-}
-
 void main()
 {
-	initgraph(700, 550);    //³õÊ¼»¯Í¼ĞÎ½çÃæ
-	MOUSEMSG p;			    //¶¨ÒåÒ»¸öÊó±êµÄ½á¹¹Ìå 
+	initgraph(700, 550);    //åˆå§‹åŒ–å›¾å½¢ç•Œé¢
+	MOUSEMSG p;			    //å®šä¹‰ä¸€ä¸ªé¼ æ ‡çš„ç»“æ„ä½“ 
 	setcolor(YELLOW);
-	//Êó±ê°´ÏÂÔò¿ªÊ¼ÔËĞĞº¯Êı
+	//é¼ æ ‡æŒ‰ä¸‹åˆ™å¼€å§‹è¿è¡Œå‡½æ•°
 	while (true)
 	{
 		p = GetMouseMsg();
-		if (p.uMsg == WM_LBUTTONDOWN) pt();
+		if (p.uMsg == WM_LBUTTONDOWN) pt();//å–æœ€åä¸€ä¸ªç‚¹ä½œä¸ºç§å­ç‚¹,ä¸€å®šè¦åœ¨å¤šè¾¹å½¢å†…,å¦åˆ™ä¼šæº¢å‡º
 	}
 }
 
 void pt()
 {
-	int N = 0;         //¼ÇÂ¼´òµã¸öÊı
-
-	MOUSEMSG m;        // ¶¨Òå½á¹¹Ìå±£´æÊó±êÏûÏ¢ 
+	int N = 0;         //è®°å½•æ‰“ç‚¹ä¸ªæ•°
+	MOUSEMSG m;        // å®šä¹‰ç»“æ„ä½“ä¿å­˜é¼ æ ‡æ¶ˆæ¯ 
 
 	while (true)
 	{
-		m = GetMouseMsg();             // »ñÈ¡Ò»´ÎÊó±êÏûÏ¢
-		switch (m.uMsg)                //ÅĞ¶ÏÊó±êĞÅÏ¢ÀàĞÍ
+		m = GetMouseMsg();             // è·å–ä¸€æ¬¡é¼ æ ‡æ¶ˆæ¯
+		switch (m.uMsg)                //åˆ¤æ–­é¼ æ ‡ä¿¡æ¯ç±»å‹
 		{
 		case WM_LBUTTONDOWN:
-			point[N].x = m.x; point[N].y = m.y;    //»ñÈ¡Êó±êµ±Ç°×ø±ê
-			circle(point[N].x, point[N].y, 1);     //»æÖÆµã
+			point[N].x = m.x; point[N].y = m.y;    //è·å–é¼ æ ‡å½“å‰åæ ‡
+			circle(point[N].x, point[N].y, 1);     //ç»˜åˆ¶ç‚¹
 			N++;
 			break;
-		case WM_RBUTTONDOWN:	  //µã»÷½øĞĞÌî³ä
+		case WM_RBUTTONDOWN:	  //ç‚¹å‡»è¿›è¡Œå¡«å……
 			setcolor(WHITE);
 			circle(point[N - 1].x, point[N - 1].y, 1);
 			edge(N, point[N - 1].x, point[N - 1].y);
@@ -137,3 +38,4 @@ void pt()
 		}
 	}
 }
+#endif

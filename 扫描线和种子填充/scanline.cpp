@@ -1,104 +1,27 @@
-#include <graphics.h>
-#include <conio.h>
-#include <stdio.h>
-#include <string.h>
-#include <queue>
-#include <windows.h>
-
+#if 0
+#include "ScanLine.h"
 using namespace std;
-
-struct Point
-{    //¼ÇÂ¼µã
-	float x, y;
-}point[100];
-
-struct Seed
-{
-	float x, y;
-}seed;
-
-struct XET
-{       //¼ÇÂ¼±ß
-	float xmin, ymax, ymin;
-	float dx;
-}pNET[1024];
-
-//ÓÅÏÈ¶ÓÁĞ±£´æÄ³ÌõÉ¨ÃèÏßÉÏµÄxÖµ
+//ä¼˜å…ˆé˜Ÿåˆ—ä¿å­˜æŸæ¡æ‰«æçº¿ä¸Šçš„xå€¼
 priority_queue<float, vector<float>, greater<float> >s;
-
 int MaxY = 0;
 int MinY = 2000;
-//´òµã
-void pt();
-//Á¬Ïß
-void DDALine(int x0, int y0, int x1, int y1, int color)
+void main()
 {
-	int t;
-	float dx, dy, k;
-	dx = x1 - x0;
-	dy = y1 - y0;
-	k = dy / dx;
-
-	if (-1 <= k && k <= 1)
-	{  //ÅĞ¶ÏĞ±ÂÊ
-		if (x1 < x0)
-		{  //È·¶¨ÆğÊ¼µãÖÕµã
-			t = x0, x0 = x1, x1 = t;
-			t = y0, y0 = y1, y1 = t;
-		}
-		int x;
-		float y;
-		y = y0;
-		for (x = x0; x <= x1; x++)
-		{
-			putpixel(x, int(y + 0.5), color);
-			y = y + k;
-		}
-	}
-	else
+	initgraph(700, 550);    //åˆå§‹åŒ–å›¾å½¢ç•Œé¢
+	MOUSEMSG p;			    //å®šä¹‰ä¸€ä¸ªé¼ æ ‡çš„ç»“æ„ä½“ 
+	setcolor(YELLOW);
+	//é¼ æ ‡æŒ‰ä¸‹åˆ™å¼€å§‹è¿è¡Œå‡½æ•°
+	while (true)
 	{
-		if (y1 < y0)
-		{  //È·¶¨ÆğÊ¼µãÖÕµã
-			t = x0, x0 = x1, x1 = t;
-			t = y0, y0 = y1, y1 = t;
-		}
-		int y;
-		float x;
-		x = x0;
-		for (y = y0; y <= y1; y++)
-		{
-			putpixel(int(x + 0.5), y, color);
-			x = x + 1 / k;
-		}
+		p = GetMouseMsg();
+		if (p.uMsg == WM_LBUTTONDOWN) pt();
 	}
-}
-//¶à±ßĞÎÉ¨ÃèÌîÉ«
-void drawColor(float a, float b, int y)
-{
-	int x;
-	for (x = a + 0.5; x <= b + 0.5; x++)
-		putpixel(x, y, RED);
-	Sleep(5);
 }
 
-//ÖØ»æ±ß
-void edge(int num, int x, int y)
-{
-	//ÔÙ´ÎÁ¬Ïß£¬±£Ö¤±ß½çÎª»ÆÉ«
-	for (int n = 1; n < num; n++)
-	{
-		DDALine(point[n - 1].x, point[n - 1].y, point[n].x, point[n].y, YELLOW);
-	}
-	DDALine(point[0].x, point[0].y, point[num - 1].x, point[num - 1].y, YELLOW);
-	//µ÷ÓÃÖÖ×ÓÌî³ä
-	//Boundfill(x, y, YELLOW, BLUE);
-	//ÖØÖÃµã
-	pt();
-}
-//É¨ÃèÌî³äËã·¨
+//æ‰«æå¡«å……ç®—æ³•
 void polyfill(int num)
 {
-	//Á¬Ïß
+	//è¿çº¿
 	for (int n = 1; n < num; n++)
 	{
 		DDALine(point[n - 1].x, point[n - 1].y, point[n].x, point[n].y, YELLOW);
@@ -106,7 +29,7 @@ void polyfill(int num)
 	DDALine(point[0].x, point[0].y, point[num - 1].x, point[num - 1].y, YELLOW);
 
 	int i, j, k, t = 0;
-	// »ñÈ¡×î´óy,×îĞ¡y
+	// è·å–æœ€å¤§y,æœ€å°y
 	for (k = 0; k < num; k++)
 	{
 		if (point[k].y > MaxY)
@@ -119,14 +42,14 @@ void polyfill(int num)
 			MinY = point[k].y;
 		}
 	}
-	//»ñÈ¡±ßĞÅÏ¢
+	//è·å–è¾¹ä¿¡æ¯
 	for (i = MinY; i <= MaxY; i++)
 	{
 		for (j = 0; j < num; j++)
 		{
 			if (point[j].y == i)
 			{
-				//°´ÄæÊ±Õë£¬Ä³¶¥µãµÄÇ°Ò»¸ö¶¥µã
+				//æŒ‰é€†æ—¶é’ˆï¼ŒæŸé¡¶ç‚¹çš„å‰ä¸€ä¸ªé¡¶ç‚¹
 				if (point[(j - 1 + num) % num].y > point[j].y)
 				{
 					struct XET p;
@@ -134,12 +57,12 @@ void polyfill(int num)
 					p.ymax = point[(j - 1 + num) % num].y;
 					p.ymin = point[j].y;
 					p.dx = (point[(j - 1 + num) % num].x - point[j].x) / (point[(j - 1 + num) % num].y - point[j].y);
-					//ÅĞ¶ÏÊÇ·ñÎª¾Ö²¿×îÖµ
+					//åˆ¤æ–­æ˜¯å¦ä¸ºå±€éƒ¨æœ€å€¼
 					if (point[(j + 1 + num) % num].y <= point[j].y)
 						p.ymin++;
 					pNET[t++] = p;
 				}
-				//°´ÄæÊ±Õë£¬Ä³¶¥µãµÄºóÒ»¸ö¶¥µã
+				//æŒ‰é€†æ—¶é’ˆï¼ŒæŸé¡¶ç‚¹çš„åä¸€ä¸ªé¡¶ç‚¹
 				if (point[(j + 1 + num) % num].y > point[j].y)
 				{
 					struct XET p;
@@ -147,7 +70,7 @@ void polyfill(int num)
 					p.ymax = point[(j + 1 + num) % num].y;
 					p.ymin = point[j].y;
 					p.dx = (point[(j + 1 + num) % num].x - point[j].x) / (point[(j + 1 + num) % num].y - point[j].y);
-					//ÅĞ¶ÏÊÇ·ñÎª¾Ö²¿×îÖµ
+					//åˆ¤æ–­æ˜¯å¦ä¸ºå±€éƒ¨æœ€å€¼
 					if (point[(j - 1 + num) % num].y <= point[j].y)
 						p.ymin++;
 					pNET[t++] = p;
@@ -155,22 +78,22 @@ void polyfill(int num)
 			}
 		}
 	}
-	//É¨ÃèÏß
+	//æ‰«æçº¿
 	for (i = MinY; i <= MaxY; i++)
 	{
 		for (j = 0; j < t; j++)
 		{
-			//µ±Ç°É¨ÃèÏßÔÚÄ³Ìõ±ßÖ®¼ä
+			//å½“å‰æ‰«æçº¿åœ¨æŸæ¡è¾¹ä¹‹é—´
 			if (pNET[j].ymin <= i && pNET[j].ymax >= i)
 			{
 				s.push(pNET[j].xmin);
-				//¸üĞÂxmin×ø±ê
+				//æ›´æ–°xminåæ ‡
 				pNET[j].xmin += pNET[j].dx;
 			}
 		}
-		//ÌîÉ«
+		//å¡«è‰²
 		while (!s.empty())
-		{	//Ã¿Á½¸öÒ»¶Ô,a,b¾ùÎªÉ¨ÃèÏßÉÏµÄx×ø±ê
+		{	//æ¯ä¸¤ä¸ªä¸€å¯¹,a,bå‡ä¸ºæ‰«æçº¿ä¸Šçš„xåæ ‡
 			float a = s.top(); s.pop();
 			float b = s.top(); s.pop();
 			drawColor(a, b, i);
@@ -179,41 +102,28 @@ void polyfill(int num)
 
 }
 
-void main()
+void pt()//é¼ æ ‡å“åº”
 {
-	initgraph(700, 550);    //³õÊ¼»¯Í¼ĞÎ½çÃæ
-	MOUSEMSG p;			    //¶¨ÒåÒ»¸öÊó±êµÄ½á¹¹Ìå 
-	setcolor(YELLOW);
-	//Êó±ê°´ÏÂÔò¿ªÊ¼ÔËĞĞº¯Êı
-	while (true)
-	{
-		p = GetMouseMsg();
-		if (p.uMsg == WM_LBUTTONDOWN) pt();
-	}
-}
+	int N = 0;         //è®°å½•æ‰“ç‚¹ä¸ªæ•°
 
-void pt()
-{
-	int N = 0;         //¼ÇÂ¼´òµã¸öÊı
-
-	MOUSEMSG m;        // ¶¨Òå½á¹¹Ìå±£´æÊó±êÏûÏ¢ 
+	MOUSEMSG m;        // å®šä¹‰ç»“æ„ä½“ä¿å­˜é¼ æ ‡æ¶ˆæ¯ 
 
 	while (true)
 	{
-		m = GetMouseMsg();             // »ñÈ¡Ò»´ÎÊó±êÏûÏ¢
-		switch (m.uMsg)                //ÅĞ¶ÏÊó±êĞÅÏ¢ÀàĞÍ
+		m = GetMouseMsg();             // è·å–ä¸€æ¬¡é¼ æ ‡æ¶ˆæ¯
+		switch (m.uMsg)                //åˆ¤æ–­é¼ æ ‡ä¿¡æ¯ç±»å‹
 		{
 		case WM_LBUTTONDOWN:
-			point[N].x = m.x; point[N].y = m.y;    //»ñÈ¡Êó±êµ±Ç°×ø±ê
-			circle(point[N].x, point[N].y, 1);     //»æÖÆµã
+			point[N].x = m.x; point[N].y = m.y;    //è·å–é¼ æ ‡å½“å‰åæ ‡
+			circle(point[N].x, point[N].y, 1);     //ç»˜åˆ¶ç‚¹
 			N++;
 			break;
-		case WM_RBUTTONDOWN:	  //µã»÷½øĞĞÌî³ä
-			polyfill(N);          //É¨ÃèÏßËã·¨
-			
-		
-		break;
+		case WM_RBUTTONDOWN:	  //ç‚¹å‡»è¿›è¡Œå¡«å……
+			polyfill(N); //æ‰«æçº¿ç®—æ³•
+
+			break;
 		}
-		
+
 	}
 }
+#endif
